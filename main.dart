@@ -1,149 +1,3 @@
-import 'package:flutter/material.dart';
-
-void main() {
-  runApp(const QuizApp());
-}
-
-class QuizApp extends StatelessWidget {
-  const QuizApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Online Quiz',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-        ),
-        useMaterial3: true,
-      ),
-      home: const HomeScreen(),
-    );
-  }
-}
-
-// QUESTION MODEL
-
-class Question {
-  final String question;
-  final List<String> options;
-  final int correctAnswer;
-
-  const Question({
-    required this.question,
-    required this.options,
-    required this.correctAnswer,
-  });
-}
-
-// QUIZ DATA
-
-const List<Question> questions = [
-  Question(
-    question: 'Which language is used to develop Flutter applications?',
-    options: [
-      'Java',
-      'Dart',
-      'Python',
-      'C++',
-    ],
-    correctAnswer: 1,
-  ),
-  Question(
-    question: 'Which company developed Flutter?',
-    options: [
-      'Microsoft',
-      'Apple',
-      'Google',
-      'Amazon',
-    ],
-    correctAnswer: 2,
-  ),
-  Question(
-    question: 'Which keyword is used to create a constant in Dart?',
-    options: [
-      'constant',
-      'final',
-      'const',
-      'static',
-    ],
-    correctAnswer: 2,
-  ),
-  Question(
-    question: 'Which widget is commonly used for a vertical layout?',
-    options: [
-      'Row',
-      'Column',
-      'Stack',
-      'Container',
-    ],
-    correctAnswer: 1,
-  ),
-  Question(
-    question: 'Which widget is used to make a scrollable list?',
-    options: [
-      'ListView',
-      'Text',
-      'Center',
-      'Icon',
-    ],
-    correctAnswer: 0,
-  ),
-  Question(
-    question: 'What is the default entry point of a Dart application?',
-    options: [
-      'start()',
-      'run()',
-      'main()',
-      'init()',
-    ],
-    correctAnswer: 2,
-  ),
-  Question(
-    question: 'Which widget is used to display text in Flutter?',
-    options: [
-      'Text',
-      'Label',
-      'String',
-      'TextView',
-    ],
-    correctAnswer: 0,
-  ),
-  Question(
-    question: 'Which file contains Flutter project dependencies?',
-    options: [
-      'main.dart',
-      'pubspec.yaml',
-      'index.html',
-      'config.json',
-    ],
-    correctAnswer: 1,
-  ),
-  Question(
-    question: 'Which widget provides a basic Material Design visual structure?',
-    options: [
-      'Scaffold',
-      'MaterialButton',
-      'Column',
-      'Padding',
-    ],
-    correctAnswer: 0,
-  ),
-  Question(
-    question: 'Which command runs a Flutter application?',
-    options: [
-      'flutter start',
-      'flutter run',
-      'flutter execute',
-      'flutter launch',
-    ],
-    correctAnswer: 1,
-  ),
-];
-
-// HOME SCREEN
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -151,13 +5,94 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Online Quiz'),
+        title: const Text(
+          'Online Quiz',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
       ),
-      body: Center(
-        child: Text(
-          'Questions: ${questions.length}',
-          style: const TextStyle(fontSize: 24),
+      body: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.quiz,
+              size: 100,
+              color: Colors.deepPurple,
+            ),
+
+            const SizedBox(height: 25),
+
+            const Text(
+              'Flutter Quiz Challenge',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            const Text(
+              'Test your Flutter and Dart knowledge!',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 17,
+                color: Colors.grey,
+              ),
+            ),
+
+            const SizedBox(height: 35),
+
+            Card(
+              elevation: 4,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Quiz Information',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    Text('Questions: ${questions.length}'),
+
+                    const SizedBox(height: 8),
+
+                    const Text('Time: 60 seconds'),
+
+                    const SizedBox(height: 8),
+
+                    const Text('Type: Multiple Choice'),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 35),
+
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                onPressed: () {},
+                child: const Text(
+                  'START QUIZ',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
