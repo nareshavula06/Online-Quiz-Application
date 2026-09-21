@@ -1,92 +1,186 @@
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+class QuizScreen extends StatefulWidget {
+  const QuizScreen({super.key});
+
+  @override
+  State<QuizScreen> createState() => _QuizScreenState();
+}
+
+class _QuizScreenState extends State<QuizScreen> {
+  int currentQuestion = 0;
+  int score = 0;
+  int? selectedAnswer;
+
+  int remainingSeconds = 60;
+  Timer? timer;
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(
+      const Duration(seconds: 1),
+      (Timer timer) {
+        if (remainingSeconds > 0) {
+          setState(() {
+            remainingSeconds--;
+          });
+        } else {
+          timer.cancel();
+        }
+      },
+    );
+  }
+
+  void selectAnswer(int index) {
+    setState(() {
+      selectedAnswer = index;
+    });
+  }
+
+  void nextQuestion() {
+    if (selectedAnswer == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select an answer.'),
+        ),
+      );
+      return;
+    }
+
+    if (selectedAnswer ==
+        questions[currentQuestion].correctAnswer) {
+      score++;
+    }
+
+    if (currentQuestion < questions.length - 1) {
+      setState(() {
+        currentQuestion++;
+        selectedAnswer = null;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final question = questions[currentQuestion];
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Online Quiz',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Quiz'),
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(
-              Icons.quiz,
-              size: 100,
-              color: Colors.deepPurple,
-            ),
-
-            const SizedBox(height: 25),
-
-            const Text(
-              'Flutter Quiz Challenge',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Question ${currentQuestion + 1}/${questions.length}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '$remainingSeconds s',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 15),
 
-            const Text(
-              'Test your Flutter and Dart knowledge!',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 17,
-                color: Colors.grey,
+            LinearProgressIndicator(
+              value: (currentQuestion + 1) / questions.length,
+            ),
+
+            const SizedBox(height: 30),
+
+            Text(
+              question.question,
+              style: const TextStyle(
+                fontSize: 23,
+                fontWeight: FontWeight.bold,
               ),
             ),
 
-            const SizedBox(height: 35),
+            const SizedBox(height: 25),
 
-            Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Quiz Information',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
+            Expanded(
+              child: ListView.builder(
+                itemCount: question.options.length,
+                itemBuilder: (context, index) {
+                  final isSelected = selectedAnswer == index;
+
+                  return GestureDetector(
+                    onTap: () => selectAnswer(index),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 15),
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.deepPurple.shade100
+                            : Colors.white,
+                        border: Border.all(
+                          color: isSelected
+                              ? Colors.deepPurple
+                              : Colors.grey.shade300,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: isSelected
+                                ? Colors.deepPurple
+                                : Colors.grey.shade200,
+                            child: Text(
+                              String.fromCharCode(65 + index),
+                            ),
+                          ),
+
+                          const SizedBox(width: 15),
+
+                          Expanded(
+                            child: Text(
+                              question.options[index],
+                              style: const TextStyle(
+                                fontSize: 17,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-
-                    const SizedBox(height: 15),
-
-                    Text('Questions: ${questions.length}'),
-
-                    const SizedBox(height: 8),
-
-                    const Text('Time: 60 seconds'),
-
-                    const SizedBox(height: 8),
-
-                    const Text('Type: Multiple Choice'),
-                  ],
-                ),
+                  );
+                },
               ),
             ),
-
-            const SizedBox(height: 35),
 
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: nextQuestion,
                 child: const Text(
-                  'START QUIZ',
+                  'NEXT QUESTION',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
