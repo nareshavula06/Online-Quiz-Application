@@ -1,192 +1,137 @@
-class QuizScreen extends StatefulWidget {
-  const QuizScreen({super.key});
+class ResultScreen extends StatelessWidget {
+  final int score;
+  final int total;
 
-  @override
-  State<QuizScreen> createState() => _QuizScreenState();
-}
+  const ResultScreen({
+    super.key,
+    required this.score,
+    required this.total,
+  });
 
-class _QuizScreenState extends State<QuizScreen> {
-  int currentQuestion = 0;
-  int score = 0;
-  int? selectedAnswer;
+  String getMessage() {
+    final percentage = (score / total) * 100;
 
-  int remainingSeconds = 60;
-  Timer? timer;
-
-  @override
-  void initState() {
-    super.initState();
-    startTimer();
-  }
-
-  void startTimer() {
-    timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (Timer timer) {
-        if (remainingSeconds > 0) {
-          setState(() {
-            remainingSeconds--;
-          });
-        } else {
-          timer.cancel();
-        }
-      },
-    );
-  }
-
-  void selectAnswer(int index) {
-    setState(() {
-      selectedAnswer = index;
-    });
-  }
-
-  void nextQuestion() {
-    if (selectedAnswer == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select an answer.'),
-        ),
-      );
-      return;
+    if (percentage >= 80) {
+      return 'Excellent! 🎉';
+    } else if (percentage >= 60) {
+      return 'Good Job! 👍';
+    } else if (percentage >= 40) {
+      return 'Keep Practicing! 📚';
+    } else {
+      return 'Try Again! 💪';
     }
-
-    if (selectedAnswer ==
-        questions[currentQuestion].correctAnswer) {
-      score++;
-    }
-
-    if (currentQuestion < questions.length - 1) {
-      setState(() {
-        currentQuestion++;
-        selectedAnswer = null;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final question = questions[currentQuestion];
+    final percentage = ((score / total) * 100).round();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Quiz'),
+        title: const Text('Quiz Result'),
         centerTitle: true,
+        automaticallyImplyLeading: false,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Question ${currentQuestion + 1}/${questions.length}',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  '$remainingSeconds s',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 15),
-
-            LinearProgressIndicator(
-              value: (currentQuestion + 1) / questions.length,
-            ),
-
-            const SizedBox(height: 30),
-
-            Text(
-              question.question,
-              style: const TextStyle(
-                fontSize: 23,
-                fontWeight: FontWeight.bold,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(25),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(
+                Icons.emoji_events,
+                size: 110,
+                color: Colors.amber,
               ),
-            ),
 
-            const SizedBox(height: 25),
+              const SizedBox(height: 20),
 
-            Expanded(
-              child: ListView.builder(
-                itemCount: question.options.length,
-                itemBuilder: (context, index) {
-                  final isSelected = selectedAnswer == index;
+              const Text(
+                'Quiz Completed!',
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
 
-                  return GestureDetector(
-                    onTap: () => selectAnswer(index),
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 15),
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.deepPurple.shade100
-                            : Colors.white,
-                        border: Border.all(
-                          color: isSelected
-                              ? Colors.deepPurple
-                              : Colors.grey.shade300,
-                          width: 2,
+              const SizedBox(height: 15),
+
+              Text(
+                getMessage(),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.deepPurple,
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              Card(
+                elevation: 5,
+                child: Padding(
+                  padding: const EdgeInsets.all(30),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Your Score',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
                         ),
-                        borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundColor: isSelected
-                                ? Colors.deepPurple
-                                : Colors.grey.shade200,
-                            child: Text(
-                              String.fromCharCode(65 + index),
-                            ),
-                          ),
 
-                          const SizedBox(width: 15),
+                      const SizedBox(height: 10),
 
-                          Expanded(
-                            child: Text(
-                              question.options[index],
-                              style: const TextStyle(
-                                fontSize: 17,
-                              ),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        '$score / $total',
+                        style: const TextStyle(
+                          fontSize: 45,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepPurple,
+                        ),
                       ),
-                    ),
-                  );
-                },
-              ),
-            ),
 
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                onPressed: nextQuestion,
-                child: const Text(
-                  'NEXT QUESTION',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+                      const SizedBox(height: 10),
+
+                      Text(
+                        '$percentage%',
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 35),
+
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomeScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                  child: const Text(
+                    'PLAY AGAIN',
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
